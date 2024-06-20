@@ -50,6 +50,10 @@ function Index() {
     Keyboard.dismiss();
   }
 
+  const handleSearchHistoryOnPress = (searchTerm: string) => {
+    setSearchTerm(searchTerm)
+  }
+
   return (
     <SafeAreaView>
       <Searchbar
@@ -63,7 +67,7 @@ function Index() {
         latestSearchHistory.map((item, index) => (
           <Card key={index}>
             <Card.Content>
-              <Text variant="bodySmall">{item}</Text>
+              <Text variant="bodySmall" onPress={() => handleSearchHistoryOnPress(item)}>{item}</Text>
             </Card.Content>
           </Card>
         ))
