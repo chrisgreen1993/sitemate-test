@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { FlatList, Keyboard, Linking, Pressable, StyleSheet, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { Searchbar, Text, Button, Card, ActivityIndicator, TouchableRipple } from 'react-native-paper';
+import { Searchbar, Text, Button, Card, ActivityIndicator } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { searchAllNews, Article } from '@/api/newsApi';
 import { useSearchHistory } from '@/hooks/useSearchHistory';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 function Index() {
   const [searchTerm, setSearchTerm] = useState('');
