@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Keyboard, Linking } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Searchbar, Text, Button, Card, ActivityIndicator } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_KEY = process.env.EXPO_PUBLIC_NEWS_API_KEY
 
@@ -17,6 +18,8 @@ const fetchNews = async (searchTerm: string) => {
 
 function Index() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchHistory, setSearchHistory] = useState([])
+  const latestSearchHistory = searchHistory.slice(0, 3);
 
   const { data: articles, refetch, error, isFetching } = useQuery({
     queryKey: ['news'],
@@ -25,7 +28,24 @@ function Index() {
     retry: false
   });
 
+  useEffect(() => {
+    const loadSearchHistory = async () => {
+      const searchHistory = await AsyncStorage.getItem('searchHistory');
+      const parsedSearchHistory = searchHistory ? JSON.parse(searchHistory) : [];
+      setSearchHistory(parsedSearchHistory);
+    }
+    loadSearchHistory()
+  }, [searchHistory])
+
+  const saveSearchTerm = async (searchTerm: string) => {
+    const searchHistory = await AsyncStorage.getItem('searchHistory');
+    const parsedSearchHistory = searchHistory ? JSON.parse(searchHistory) : [];
+    const updatedSearchHistory = [searchTerm, ...parsedSearchHistory];
+    AsyncStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
+  }
+
   const handleSearchOnPress = () => {
+    saveSearchTerm(searchTerm);
     refetch();
     Keyboard.dismiss();
   }
@@ -39,9 +59,18 @@ function Index() {
         onSubmitEditing={() => refetch()}
       />
       <Button disabled={!searchTerm.length} mode="contained" onPress={handleSearchOnPress}>Search News</Button>
+      {!!searchHistory.length && (
+        latestSearchHistory.map((item, index) => (
+          <Card key={index}>
+            <Card.Content>
+              <Text variant="bodySmall">{item}</Text>
+            </Card.Content>
+          </Card>
+        ))
+      )}
+
       {isFetching && <ActivityIndicator animating />}
       {error && <Text>Whoops! Looks like something went wrong!</Text>}
-
       {!isFetching && (
         <FlatList
           data={articles}
