@@ -4,26 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Searchbar, Text, Button, Card, ActivityIndicator } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_KEY = process.env.EXPO_PUBLIC_NEWS_API_KEY
-
-const fetchNews = async (searchTerm: string) => {
-  const res = await fetch(`https://newsapi.org/v2/everything?q=${searchTerm}&apiKey=${API_KEY}`);
-  if (!res.ok) {
-    throw Error('Network response was not ok');
-  }
-  const data = await res.json();
-  return data.articles;
-};
+import { searchAllNews, Article } from '@/api/newsApi';
 
 function Index() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchHistory, setSearchHistory] = useState([])
   const latestSearchHistory = searchHistory.slice(0, 3);
 
-  const { data: articles, refetch, error, isFetching } = useQuery({
+  const { data: articles, refetch, error, isFetching } = useQuery<Article[]>({
     queryKey: ['news'],
-    queryFn: () => fetchNews(searchTerm),
+    queryFn: () => searchAllNews(searchTerm),
     enabled: false,
     retry: false
   });
@@ -78,7 +68,7 @@ function Index() {
       {!isFetching && (
         <FlatList
           data={articles}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(_item, index) => index.toString()}
           renderItem={({ item }) => (
             <Card>
               <Card.Content>
