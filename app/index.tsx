@@ -39,9 +39,9 @@ function Index() {
       <Button disabled={!searchTerm.length} mode="contained" onPress={handleSearchOnPress}>Search News</Button>
       {!!searchHistory.length && (
         latestSearchHistory.map((item, index) => (
-          <Card key={index}>
+          <Card key={index} onPress={() => handleSearchHistoryOnPress(item)}>
             <Card.Content>
-              <Text variant="bodySmall" onPress={() => handleSearchHistoryOnPress(item)}>{item}</Text>
+              <Text variant="bodySmall">{item}</Text>
             </Card.Content>
           </Card>
         ))
@@ -54,9 +54,9 @@ function Index() {
           data={articles}
           keyExtractor={(_item, index) => index.toString()}
           renderItem={({ item }) => (
-            <Card>
+            <Card onPress={() => Linking.openURL(item.url)}>
               <Card.Content>
-                <Text variant="titleSmall" onPress={() => Linking.openURL(item.url)}>{item.title}</Text>
+                <Text variant="titleSmall">{item.title}</Text>
                 <Text variant="bodySmall">{item.description}</Text>
               </Card.Content>
             </Card>
